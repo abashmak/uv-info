@@ -58,7 +58,6 @@ function fetchUV(lat, lon) {
         }
 
         let uv = data.uv
-        if (uv === null) uv = 0;
 
         let r = riskLevel(uv)
 
@@ -133,7 +132,6 @@ function fetchLocationUV() {
         return
     }
 
-    // fetchUV(33.346683, -111.932179)
     navigator.geolocation.getCurrentPosition(
         pos => {
             fetchUV(pos.coords.latitude, pos.coords.longitude)

@@ -36,23 +36,22 @@ $url =
 "latitude=$lat&longitude=$lon" .
 "&hourly=uv_index" .
 "&daily=sunset" .
-"&current_weather=true" .
+"&forecast_days=1" .
 "&timezone=auto";
-error_log($url);
 $data = callAPI($url);
 
 if (!$data) {
     echo json_encode(["error"=>"Weather API failure"]);
     exit;
 }
-error_log(print_r($data['current'], true));
 /*
 Current UV
 */
-$uv = $data['current']['uv_index'] ?? null;
+$uv = $data['hourly']['uv_index'][0] ?? null;
+error_log(print_r($data, true));
 
 /*
-Forecast (next 8 hours)
+Forecast (6am to 5pm)
 */
 $forecastData = [];
 
@@ -61,20 +60,16 @@ if (isset($data['hourly']['time'])) {
     $times = $data['hourly']['time'];
     $uvs   = $data['hourly']['uv_index'];
 
-    $now = time();
-
     for ($i=0; $i<count($times); $i++) {
 
-        $t = strtotime($times[$i]);
+        $hour = (int) date('H', strtotime($times[$i]));
 
-        if ($t >= $now) {
+        if ($hour >= 6 && $hour <= 17) {
 
             $forecastData[] = [
                 "time" => $times[$i],
                 "uv" => $uvs[$i]
             ];
-
-            if (count($forecastData) >= 8) break;
         }
     }
 }
