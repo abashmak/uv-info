@@ -1,17 +1,13 @@
 function riskLevel(uv) {
-
-    if (uv < 3) return ["Low","low"]
-    if (uv < 6) return ["Moderate","moderate"]
-    if (uv < 8) return ["High","high"]
-    if (uv < 11) return ["Very High","veryhigh"]
-    return ["Extreme","extreme"]
-
+    if (uv < 3) return ["Low", "low"];
+    if (uv < 6) return ["Moderate", "moderate"];
+    if (uv < 8) return ["High", "high"];
+    if (uv < 11) return ["Very High", "veryhigh"];
+    return ["Extreme", "extreme"];
 }
 
-function showLoading(show=true) {
-
-    document.getElementById('spinner').style.display = show ? 'block' : 'none'
-
+function showLoading(show = true) {
+    document.getElementById('spinner').style.display = show ? 'block' : 'none';
 }
 
 function populateExposureTimes(safeExposure) {
@@ -44,30 +40,29 @@ function populateExposureTimes(safeExposure) {
 }
 
 function fetchUV(lat, lon) {
-
-    showLoading(true)
+    showLoading(true);
 
     fetch(`get_uv.php?lat=${lat}&lon=${lon}`)
     .then(r => r.json())
     .then(data => {
-        showLoading(false)
+        showLoading(false);
 
         if (data.error) {
-            alert(data.error)
-            return
+            alert(data.error);
+            return;
         }
 
-        let uv = data.uv
+        let uv = data.uv;
 
-        let r = riskLevel(uv)
+        let r = riskLevel(uv);
 
-        let uvEl = document.getElementById("uvvalue")
-        uvEl.innerText = uv.toFixed(1)
-        uvEl.className = r[1]
+        let uvEl = document.getElementById("uvvalue");
+        uvEl.innerText = uv.toFixed(1);
+        uvEl.className = r[1];
 
-        document.getElementById("risk").innerText = r[0] + " risk"
+        document.getElementById("risk").innerText = r[0] + " risk";
 
-        let now = new Date()
+        let now = new Date();
 
         document.getElementById("currentTime").innerText =
             now.toLocaleString([], {
@@ -76,45 +71,45 @@ function fetchUV(lat, lon) {
                 day: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit'
-            })
+            });
 
-        let forecastEl = document.getElementById("forecast")
-        forecastEl.innerHTML = ""
+        let forecastEl = document.getElementById("forecast");
+        forecastEl.innerHTML = "";
 
-        ;(data.forecast || []).forEach(f => {
-            let container = document.createElement("div")
-            container.className = "bar-container"
+        (data.forecast || []).forEach(f => {
+            let container = document.createElement("div");
+            container.className = "bar-container";
 
-            let uvVal = document.createElement("div")
-            uvVal.className = "bar-value"
-            uvVal.innerText = f.uv.toFixed(1)
+            let uvVal = document.createElement("div");
+            uvVal.className = "bar-value";
+            uvVal.innerText = f.uv.toFixed(1);
 
-            let bar = document.createElement("div")
-            let rf = riskLevel(f.uv)
+            let bar = document.createElement("div");
+            let rf = riskLevel(f.uv);
 
-            bar.className = "bar " + rf[1]
-            bar.style.height = Math.min(f.uv * 10, 100) + "px"
+            bar.className = "bar " + rf[1];
+            bar.style.height = Math.min(f.uv * 10, 100) + "px";
 
-            let time = document.createElement("div")
-            time.className = "bar-time"
+            let time = document.createElement("div");
+            time.className = "bar-time";
 
-            let t = new Date(f.time)
-            time.innerText = t.getHours()
+            let t = new Date(f.time);
+            time.innerText = t.getHours();
 
-            container.appendChild(uvVal)
-            container.appendChild(bar)
-            container.appendChild(time)
+            container.appendChild(uvVal);
+            container.appendChild(bar);
+            container.appendChild(time);
 
-            forecastEl.appendChild(container)
-        })
+            forecastEl.appendChild(container);
+        });
 
         if (data.sunrise && data.sunset) {
             let sunTimesEl = document.getElementById("sun-times");
             let sr = new Date(data.sunrise);
             let ss = new Date(data.sunset);
             sunTimesEl.innerText =
-                "Sunrise: " + sr.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) +
-                " | Sunset: " + ss.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                "Sunrise: " + sr.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) +
+                " | Sunset: " + ss.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
         }
 
         if (data.safeExposure) {
@@ -122,42 +117,42 @@ function fetchUV(lat, lon) {
         }
     })
     .catch(err => {
-        showLoading(false)
-        alert("Failed to fetch UV index")
-    })
+        showLoading(false);
+        alert("Failed to fetch UV index");
+    });
 }
 
 function fetchLocationUV() {
     if (!navigator.geolocation) {
-        alert("Geolocation not supported")
-        return
+        alert("Geolocation not supported");
+        return;
     }
 
     navigator.geolocation.getCurrentPosition(
         pos => {
-            fetchUV(pos.coords.latitude, pos.coords.longitude)
+            fetchUV(pos.coords.latitude, pos.coords.longitude);
         },
 
         err => {
-            switch(err.code) {
+            switch (err.code) {
                 case err.PERMISSION_DENIED:
-                    alert("Location permission denied")
-                    break
+                    alert("Location permission denied");
+                    break;
                 case err.POSITION_UNAVAILABLE:
-                    alert("Location unavailable")
-                    break
+                    alert("Location unavailable");
+                    break;
                 case err.TIMEOUT:
-                    alert("Location request timed out")
-                    break
+                    alert("Location request timed out");
+                    break;
                 default:
-                    alert("Location error")
+                    alert("Location error");
             }
         },
         {
-            timeout:15000,
-            maximumAge:60000
+            timeout: 15000,
+            maximumAge: 60000
         }
-    )
+    );
 }
 
-fetchLocationUV()
+fetchLocationUV();

@@ -82,17 +82,13 @@ if (isset($data['hourly']['time']) && $sunrise && $sunset) {
 }
 
 /*
-Sunset
-*/
-$sunset = $data['daily']['sunset'][0] ?? null;
-
-
-/*
 Safe exposure calculation
 */
 function calculateSafeExposure($uv)
 {
-    if (!$uv || $uv <= 0) return null;
+    if (!$uv || $uv <= 0) {
+        return null;
+    }
 
     $MED = [
         "st1" => 200,
@@ -106,9 +102,7 @@ function calculateSafeExposure($uv)
     $times = [];
 
     foreach ($MED as $type => $med) {
-
         $minutes = $med / (1.5 * $uv);
-
         $times[$type] = round($minutes);
     }
 
