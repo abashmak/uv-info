@@ -85,9 +85,27 @@ header {
 
 .forecast {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: flex-end;
     margin-top: 20px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    gap: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: #ccc transparent;
+}
+
+.forecast::-webkit-scrollbar {
+    height: 4px;
+}
+
+.forecast::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.forecast::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 2px;
 }
 
 .sun-times {
@@ -104,7 +122,23 @@ header {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 32px;
+    min-width: 28px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 360px) {
+    .bar-container {
+        min-width: 24px;
+    }
+    .bar {
+        width: 14px;
+    }
+    .bar-value {
+        font-size: 10px;
+    }
+    .bar-time {
+        font-size: 10px;
+    }
 }
 
 .bar-value {
@@ -114,7 +148,7 @@ header {
 }
 
 .bar {
-    width: 22px;
+    width: 18px;
     border-radius: 4px 4px 0 0;
 }
 
