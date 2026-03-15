@@ -108,12 +108,13 @@ function fetchUV(lat, lon) {
             forecastEl.appendChild(container)
         })
 
-        if (data.sunset) {
-            let sunsetEl = document.getElementById("sunset");
-            let s = new Date(data.sunset);
-            sunsetEl.innerText =
-                "Sunset: " +
-                s.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        if (data.sunrise && data.sunset) {
+            let sunTimesEl = document.getElementById("sun-times");
+            let sr = new Date(data.sunrise);
+            let ss = new Date(data.sunset);
+            sunTimesEl.innerText =
+                "Sunrise: " + sr.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) +
+                " | Sunset: " + ss.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
         }
 
         if (data.safeExposure) {

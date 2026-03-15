@@ -35,7 +35,7 @@ $url =
 "https://api.open-meteo.com/v1/forecast?" .
 "latitude=$lat&longitude=$lon" .
 "&hourly=uv_index" .
-"&daily=sunset" .
+"&daily=sunrise,sunset" .
 "&current=uv_index" .
 "&forecast_days=1" .
 "&timezone=auto";
@@ -52,20 +52,26 @@ $uv = $data['current']['uv_index'] ?? null;
 error_log(print_r($data, true));
 
 /*
-Forecast (6am to 5pm)
+Forecast (between sunrise and sunset)
 */
 $forecastData = [];
 
-if (isset($data['hourly']['time'])) {
+$sunrise = $data['daily']['sunrise'][0] ?? null;
+$sunset = $data['daily']['sunset'][0] ?? null;
+
+if (isset($data['hourly']['time']) && $sunrise && $sunset) {
 
     $times = $data['hourly']['time'];
     $uvs   = $data['hourly']['uv_index'];
 
+    $sunriseTime = strtotime($sunrise);
+    $sunsetTime = strtotime($sunset);
+
     for ($i=0; $i<count($times); $i++) {
 
-        $hour = (int) date('H', strtotime($times[$i]));
+        $timeStamp = strtotime($times[$i]);
 
-        if ($hour >= 6 && $hour <= 17) {
+        if ($timeStamp >= $sunriseTime && $timeStamp <= $sunsetTime) {
 
             $forecastData[] = [
                 "time" => $times[$i],
@@ -114,6 +120,7 @@ $safeExposure = calculateSafeExposure($uv);
 echo json_encode([
     "uv" => $uv,
     "forecast" => $forecastData,
+    "sunrise" => $sunrise,
     "sunset" => $sunset,
     "safeExposure" => $safeExposure
 ]);

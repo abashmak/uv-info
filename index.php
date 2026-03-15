@@ -29,7 +29,7 @@
 
         <div id="forecast" class="forecast"></div>
 
-        <div id="sunset" class="sunset"></div>
+        <div id="sun-times" class="sun-times"></div>
 
         <div id="exposure-times" class="exposure-times">
             <div id="exposure-times-title" class="exposure-times-title">
