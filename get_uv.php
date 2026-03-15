@@ -36,6 +36,7 @@ $url =
 "latitude=$lat&longitude=$lon" .
 "&hourly=uv_index" .
 "&daily=sunset" .
+"&current=uv_index" .
 "&forecast_days=1" .
 "&timezone=auto";
 $data = callAPI($url);
@@ -47,7 +48,7 @@ if (!$data) {
 /*
 Current UV
 */
-$uv = $data['hourly']['uv_index'][0] ?? null;
+$uv = $data['current']['uv_index'] ?? null;
 error_log(print_r($data, true));
 
 /*
