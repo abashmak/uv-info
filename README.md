@@ -29,16 +29,29 @@ Safe exposure times are calculated for three skin types based on Minimal Erythem
 
 ## Requirements
 
-- Web server with PHP support
+- For traditional setup: Web server with PHP support
+- For Docker setup: Docker Desktop
 - Internet connection for API calls
 - Modern web browser with geolocation support
 
 ## Installation
 
+### Option 1: Traditional Web Server
 1. Clone or download the repository
 2. Upload files to your web server
 3. Ensure PHP is enabled on your server
 4. Access the app through your web browser
+
+### Option 2: Docker (Recommended for Local Development)
+1. Ensure Docker Desktop is installed on your machine
+2. Clone or download the repository
+3. Build the Docker image: `docker build -t uv-info .`
+4. Run the container (for development with live reload): `docker run -p 8080:80 -v "$(pwd):/var/www/html" uv-info`
+5. Access the app at http://localhost:8080
+
+**Notes:**
+- For production, omit the `-v` flag and rebuild the image to include files statically.
+- The `.dockerignore` file excludes unnecessary files from the build context for faster builds.
 
 ## Usage
 
