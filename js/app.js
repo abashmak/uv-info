@@ -247,6 +247,8 @@ function fetchLocationUV() {
         return;
     }
 
+    showLoading(true);
+
     navigator.geolocation.getCurrentPosition(
         pos => {
             fetchUV(pos.coords.latitude, pos.coords.longitude);
