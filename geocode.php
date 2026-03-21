@@ -19,20 +19,18 @@ $params = [
 
 $url = "https://geocoding-api.open-meteo.com/v1/search?" . http_build_query($params);
 
-$ch = curl_init($url);
-curl_setopt_array($ch, [
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_TIMEOUT => 10,
-    CURLOPT_FOLLOWLOCATION => true
-]);
+$opts = [
+    "http" => [
+        "method" => "GET",
+        "timeout" => 10
+    ]
+];
 
-$response = curl_exec($ch);
-$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-$curlError = curl_error($ch);
-curl_close($ch);
+$context = stream_context_create($opts);
+$response = @file_get_contents($url, false, $context);
 
-if (!$response || $httpCode !== 200) {
-    echo json_encode(["error" => "Geocoding request failed" . ($curlError ? ": $curlError" : "")]);
+if (!$response) {
+    echo json_encode(["error" => "Geocoding request failed"]);
     exit;
 }
 
