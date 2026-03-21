@@ -19,6 +19,7 @@
   <div class="container">
     <div id="uvbox">
       <div id="spinner" class="spinner"></div>
+      <div id="status-message" class="status-message"></div>
 
       <div id="location-mode" class="location-mode">
         <p class="location-prompt">How should we find your location?</p>

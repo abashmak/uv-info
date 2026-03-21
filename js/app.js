@@ -8,8 +8,11 @@ function riskLevel(uv) {
     return ["Extreme", "extreme"];
 }
 
-function showLoading(show = true) {
+function showLoading(show = true, message = '') {
     document.getElementById('spinner').style.display = show ? 'block' : 'none';
+    let msgEl = document.getElementById('status-message');
+    msgEl.textContent = message;
+    msgEl.style.display = show && message ? 'block' : 'none';
 }
 
 function hideResults() {
@@ -154,7 +157,7 @@ function populateExposureTimes(safeExposure) {
 }
 
 function fetchUV(lat, lon) {
-    showLoading(true);
+    showLoading(true, 'Fetching UV data...');
 
     fetch(`get_uv.php?lat=${lat}&lon=${lon}`)
     .then(r => r.json())
@@ -247,7 +250,7 @@ function fetchLocationUV() {
         return;
     }
 
-    showLoading(true);
+    showLoading(true, 'Obtaining location...');
 
     navigator.geolocation.getCurrentPosition(
         pos => {
@@ -291,7 +294,7 @@ function geocodeAndFetch(query) {
     }
 
     document.getElementById('location-mode').style.display = 'none';
-    showLoading(true);
+    showLoading(true, 'Looking up location...');
 
     fetch('geocode.php?q=' + encodeURIComponent(query))
     .then(r => r.json())
