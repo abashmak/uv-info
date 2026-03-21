@@ -49,6 +49,13 @@ header {
     margin: 10px 0;
 }
 
+.location-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 6px;
+}
+
 .current-time {
     display: inline-block;
     background: #E3F2FD;
@@ -190,4 +197,100 @@ header {
     display: flex;
     justify-content: space-between;
     padding: 3px 0;
+}
+
+.location-mode {
+    margin-bottom: 16px;
+}
+
+.location-prompt {
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0 0 12px 0;
+    color: #333;
+}
+
+.mode-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.mode-btn {
+    flex: 1;
+    padding: 10px 0;
+    border: 2px solid #2196F3;
+    background: white;
+    color: #2196F3;
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.mode-btn:hover,
+.mode-btn.active {
+    background: #2196F3;
+    color: white;
+}
+
+.manual-input {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+}
+
+.manual-input input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.manual-input input[type="text"]:focus {
+    outline: none;
+    border-color: #2196F3;
+}
+
+.lookup-btn {
+    width: 100%;
+    padding: 10px 0;
+    background: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.lookup-btn:hover {
+    background: #1976D2;
+}
+
+.geocode-error {
+    color: #c62828;
+    font-size: 13px;
+    font-weight: 500;
+    min-height: 18px;
+}
+
+@media (max-width: 360px) {
+    .mode-btn {
+        font-size: 14px;
+        padding: 8px 0;
+    }
+    .manual-input input[type="text"] {
+        font-size: 14px;
+    }
 }

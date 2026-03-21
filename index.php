@@ -20,6 +20,21 @@
     <div id="uvbox">
       <div id="spinner" class="spinner"></div>
 
+      <div id="location-mode" class="location-mode">
+        <p class="location-prompt">How should we find your location?</p>
+        <div class="mode-buttons">
+          <button id="btn-auto" class="mode-btn" type="button">Auto</button>
+          <button id="btn-manual" class="mode-btn" type="button">Manual</button>
+        </div>
+        <div id="manual-input" class="manual-input" style="display:none;">
+          <input type="text" id="address-input" placeholder="Enter city name or zip code" autocomplete="off">
+          <button id="btn-lookup" class="lookup-btn" type="button">Look Up</button>
+          <div id="geocode-error" class="geocode-error"></div>
+        </div>
+      </div>
+
+      <div id="location-name" class="location-name"></div>
+
       <div id="currentTime" class="current-time"></div>
 
       <div id="uvvalue">--</div>
