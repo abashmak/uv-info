@@ -56,6 +56,17 @@ header {
     margin-bottom: 6px;
 }
 
+.save-favorite {
+    font-size: 12px;
+    color: #2196F3;
+    text-decoration: none;
+    margin-left: 6px;
+}
+
+.save-favorite:hover {
+    text-decoration: underline;
+}
+
 .current-time {
     display: inline-block;
     background: #E3F2FD;
@@ -283,6 +294,55 @@ header {
     font-size: 13px;
     font-weight: 500;
     min-height: 18px;
+}
+
+.favorites {
+    margin-top: 14px;
+    text-align: left;
+}
+
+.favorites-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 6px;
+}
+
+.favorites-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.favorite-item {
+    display: inline-flex;
+    align-items: center;
+    background: #E3F2FD;
+    border-radius: 14px;
+    padding: 4px 10px;
+    font-size: 13px;
+}
+
+.favorite-link {
+    color: #1565C0;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.favorite-link:hover {
+    text-decoration: underline;
+}
+
+.favorite-remove {
+    color: #90A4AE;
+    text-decoration: none;
+    margin-left: 6px;
+    font-size: 15px;
+    line-height: 1;
+}
+
+.favorite-remove:hover {
+    color: #c62828;
 }
 
 @media (max-width: 360px) {

@@ -1,3 +1,5 @@
+var currentLocation = null;
+
 function riskLevel(uv) {
     if (uv < 3) return ["Low", "low"];
     if (uv < 6) return ["Moderate", "moderate"];
@@ -20,6 +22,106 @@ function showResults() {
     ['location-name', 'currentTime', 'uvvalue', 'risk', 'forecast', 'sun-times', 'exposure-times'].forEach(id => {
         document.getElementById(id).style.display = '';
     });
+}
+
+function getFavorites() {
+    try {
+        return JSON.parse(localStorage.getItem('uv-favorites')) || [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function saveFavorites(favs) {
+    localStorage.setItem('uv-favorites', JSON.stringify(favs));
+}
+
+function isFavorite(lat, lon) {
+    return getFavorites().some(f => f.lat === lat && f.lon === lon);
+}
+
+function addFavorite(name, lat, lon) {
+    let favs = getFavorites();
+    if (!favs.some(f => f.lat === lat && f.lon === lon)) {
+        favs.push({ name: name, lat: lat, lon: lon });
+        saveFavorites(favs);
+    }
+}
+
+function removeFavorite(lat, lon) {
+    let favs = getFavorites().filter(f => f.lat !== lat || f.lon !== lon);
+    saveFavorites(favs);
+}
+
+function renderFavorites() {
+    let container = document.getElementById('favorites');
+    let favs = getFavorites();
+
+    container.innerHTML = '';
+
+    if (favs.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+
+    container.style.display = 'block';
+
+    let title = document.createElement('div');
+    title.className = 'favorites-title';
+    title.textContent = 'Favorites:';
+    container.appendChild(title);
+
+    let list = document.createElement('div');
+    list.className = 'favorites-list';
+
+    favs.forEach(fav => {
+        let item = document.createElement('div');
+        item.className = 'favorite-item';
+
+        let link = document.createElement('a');
+        link.href = '#';
+        link.className = 'favorite-link';
+        link.textContent = fav.name;
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            currentLocation = { name: fav.name, lat: fav.lat, lon: fav.lon };
+            document.getElementById('location-name-text').textContent = fav.name;
+            updateSaveLink();
+            document.getElementById('location-mode').style.display = 'none';
+            fetchUV(fav.lat, fav.lon);
+        });
+
+        let removeBtn = document.createElement('a');
+        removeBtn.href = '#';
+        removeBtn.className = 'favorite-remove';
+        removeBtn.textContent = '\u00d7';
+        removeBtn.title = 'Remove';
+        removeBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            removeFavorite(fav.lat, fav.lon);
+            renderFavorites();
+            updateSaveLink();
+        });
+
+        item.appendChild(link);
+        item.appendChild(removeBtn);
+        list.appendChild(item);
+    });
+
+    container.appendChild(list);
+}
+
+function updateSaveLink() {
+    let saveLink = document.getElementById('save-favorite');
+    if (!currentLocation || !currentLocation.name) {
+        saveLink.style.display = 'none';
+        return;
+    }
+    if (isFavorite(currentLocation.lat, currentLocation.lon)) {
+        saveLink.style.display = 'none';
+    } else {
+        saveLink.style.display = '';
+    }
 }
 
 function populateExposureTimes(safeExposure) {
@@ -128,6 +230,8 @@ function fetchUV(lat, lon) {
         if (data.safeExposure) {
             populateExposureTimes(data.safeExposure);
         }
+
+        updateSaveLink();
     })
     .catch(err => {
         showLoading(false);
@@ -196,9 +300,9 @@ function geocodeAndFetch(query) {
             document.getElementById('geocode-error').textContent = data.error + ' Try a different address.';
             return;
         }
-        if (data.display_name) {
-            document.getElementById('location-name').textContent = data.display_name;
-        }
+        currentLocation = { name: data.display_name, lat: data.lat, lon: data.lon };
+        document.getElementById('location-name-text').textContent = data.display_name;
+        updateSaveLink();
         fetchUV(data.lat, data.lon);
     })
     .catch(err => {
@@ -219,6 +323,7 @@ function initApp() {
     modeEl.style.display = 'block';
     showLoading(false);
     hideResults();
+    renderFavorites();
 
     btnAuto.addEventListener('click', function () {
         modeEl.style.display = 'none';
@@ -239,6 +344,14 @@ function initApp() {
     addressInput.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') {
             geocodeAndFetch(addressInput.value.trim());
+        }
+    });
+
+    document.getElementById('save-favorite').addEventListener('click', function (e) {
+        e.preventDefault();
+        if (currentLocation && currentLocation.name) {
+            addFavorite(currentLocation.name, currentLocation.lat, currentLocation.lon);
+            updateSaveLink();
         }
     });
 }

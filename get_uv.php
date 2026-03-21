@@ -49,7 +49,6 @@ if (!$data) {
 Current UV
 */
 $uv = $data['current']['uv_index'] ?? null;
-error_log(print_r($data, true));
 
 /*
 Forecast (between sunrise and sunset)

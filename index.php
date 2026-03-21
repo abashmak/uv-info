@@ -31,9 +31,13 @@
           <button id="btn-lookup" class="lookup-btn" type="button">Look Up</button>
           <div id="geocode-error" class="geocode-error"></div>
         </div>
+        <div id="favorites" class="favorites"></div>
       </div>
 
-      <div id="location-name" class="location-name"></div>
+      <div id="location-name" class="location-name">
+        <span id="location-name-text"></span>
+        <a href="#" id="save-favorite" class="save-favorite" style="display:none;">save</a>
+      </div>
 
       <div id="currentTime" class="current-time"></div>
 
