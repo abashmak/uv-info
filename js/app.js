@@ -1,3 +1,5 @@
+var currentLocation = null;
+
 function riskLevel(uv) {
     if (uv < 3) return ["Low", "low"];
     if (uv < 6) return ["Moderate", "moderate"];
@@ -6,8 +8,123 @@ function riskLevel(uv) {
     return ["Extreme", "extreme"];
 }
 
-function showLoading(show = true) {
+function showLoading(show = true, message = '') {
     document.getElementById('spinner').style.display = show ? 'block' : 'none';
+    let msgEl = document.getElementById('status-message');
+    msgEl.textContent = message;
+    msgEl.style.display = show && message ? 'block' : 'none';
+}
+
+function hideResults() {
+    ['location-name', 'currentTime', 'uvvalue', 'risk', 'forecast', 'sun-times', 'exposure-times'].forEach(id => {
+        document.getElementById(id).style.display = 'none';
+    });
+}
+
+function showResults() {
+    ['location-name', 'currentTime', 'uvvalue', 'risk', 'forecast', 'sun-times', 'exposure-times'].forEach(id => {
+        document.getElementById(id).style.display = '';
+    });
+}
+
+function getFavorites() {
+    try {
+        return JSON.parse(localStorage.getItem('uv-favorites')) || [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function saveFavorites(favs) {
+    localStorage.setItem('uv-favorites', JSON.stringify(favs));
+}
+
+function isFavorite(lat, lon) {
+    return getFavorites().some(f => f.lat === lat && f.lon === lon);
+}
+
+function addFavorite(name, lat, lon) {
+    let favs = getFavorites();
+    if (!favs.some(f => f.lat === lat && f.lon === lon)) {
+        favs.push({ name: name, lat: lat, lon: lon });
+        saveFavorites(favs);
+    }
+}
+
+function removeFavorite(lat, lon) {
+    let favs = getFavorites().filter(f => f.lat !== lat || f.lon !== lon);
+    saveFavorites(favs);
+}
+
+function renderFavorites() {
+    let container = document.getElementById('favorites');
+    let favs = getFavorites();
+
+    container.innerHTML = '';
+
+    if (favs.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+
+    container.style.display = 'block';
+
+    let title = document.createElement('div');
+    title.className = 'favorites-title';
+    title.textContent = 'Favorites:';
+    container.appendChild(title);
+
+    let list = document.createElement('div');
+    list.className = 'favorites-list';
+
+    favs.forEach(fav => {
+        let item = document.createElement('div');
+        item.className = 'favorite-item';
+
+        let link = document.createElement('a');
+        link.href = '#';
+        link.className = 'favorite-link';
+        link.textContent = fav.name;
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            currentLocation = { name: fav.name, lat: fav.lat, lon: fav.lon };
+            document.getElementById('location-name-text').textContent = fav.name;
+            updateSaveLink();
+            document.getElementById('location-mode').style.display = 'none';
+            fetchUV(fav.lat, fav.lon);
+        });
+
+        let removeBtn = document.createElement('a');
+        removeBtn.href = '#';
+        removeBtn.className = 'favorite-remove';
+        removeBtn.textContent = '\u00d7';
+        removeBtn.title = 'Remove';
+        removeBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            removeFavorite(fav.lat, fav.lon);
+            renderFavorites();
+            updateSaveLink();
+        });
+
+        item.appendChild(link);
+        item.appendChild(removeBtn);
+        list.appendChild(item);
+    });
+
+    container.appendChild(list);
+}
+
+function updateSaveLink() {
+    let saveLink = document.getElementById('save-favorite');
+    if (!currentLocation || !currentLocation.name) {
+        saveLink.style.display = 'none';
+        return;
+    }
+    if (isFavorite(currentLocation.lat, currentLocation.lon)) {
+        saveLink.style.display = 'none';
+    } else {
+        saveLink.style.display = '';
+    }
 }
 
 function populateExposureTimes(safeExposure) {
@@ -40,12 +157,13 @@ function populateExposureTimes(safeExposure) {
 }
 
 function fetchUV(lat, lon) {
-    showLoading(true);
+    showLoading(true, 'Fetching UV data...');
 
     fetch(`get_uv.php?lat=${lat}&lon=${lon}`)
     .then(r => r.json())
     .then(data => {
         showLoading(false);
+        showResults();
 
         if (data.error) {
             alert(data.error);
@@ -54,13 +172,13 @@ function fetchUV(lat, lon) {
 
         let uv = data.uv;
 
-        let r = riskLevel(uv);
+        let rl = riskLevel(uv);
 
         let uvEl = document.getElementById("uvvalue");
         uvEl.innerText = uv.toFixed(1);
-        uvEl.className = r[1];
+        uvEl.className = rl[1];
 
-        document.getElementById("risk").innerText = r[0] + " risk";
+        document.getElementById("risk").innerText = rl[0] + " risk";
 
         let now = new Date();
 
@@ -115,6 +233,8 @@ function fetchUV(lat, lon) {
         if (data.safeExposure) {
             populateExposureTimes(data.safeExposure);
         }
+
+        updateSaveLink();
     })
     .catch(err => {
         showLoading(false);
@@ -124,9 +244,13 @@ function fetchUV(lat, lon) {
 
 function fetchLocationUV() {
     if (!navigator.geolocation) {
-        alert("Geolocation not supported");
+        document.getElementById('location-mode').style.display = 'block';
+        document.getElementById('geocode-error').textContent = 'Geolocation not supported. Try entering an address instead.';
+        document.getElementById('manual-input').style.display = 'flex';
         return;
     }
+
+    showLoading(true, 'Obtaining location...');
 
     navigator.geolocation.getCurrentPosition(
         pos => {
@@ -134,18 +258,23 @@ function fetchLocationUV() {
         },
 
         err => {
+            showLoading(false);
+            document.getElementById('location-mode').style.display = 'block';
+            document.getElementById('manual-input').style.display = 'flex';
+
+            let errorEl = document.getElementById('geocode-error');
             switch (err.code) {
                 case err.PERMISSION_DENIED:
-                    alert("Location permission denied");
+                    errorEl.textContent = 'Location permission denied. Try entering an address instead.';
                     break;
                 case err.POSITION_UNAVAILABLE:
-                    alert("Location unavailable");
+                    errorEl.textContent = 'Location unavailable. Try entering an address instead.';
                     break;
                 case err.TIMEOUT:
-                    alert("Location request timed out");
+                    errorEl.textContent = 'Location request timed out. Try entering an address instead.';
                     break;
                 default:
-                    alert("Location error");
+                    errorEl.textContent = 'Location error. Try entering an address instead.';
             }
         },
         {
@@ -155,4 +284,81 @@ function fetchLocationUV() {
     );
 }
 
-fetchLocationUV();
+function geocodeAndFetch(query) {
+    let errorEl = document.getElementById('geocode-error');
+    errorEl.textContent = '';
+
+    if (!query) {
+        errorEl.textContent = 'Please enter an address or zip code.';
+        return;
+    }
+
+    document.getElementById('location-mode').style.display = 'none';
+    showLoading(true, 'Looking up location...');
+
+    fetch('geocode.php?q=' + encodeURIComponent(query))
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) {
+            showLoading(false);
+            document.getElementById('location-mode').style.display = 'block';
+            document.getElementById('geocode-error').textContent = data.error + ' Try a different address.';
+            return;
+        }
+        currentLocation = { name: data.display_name, lat: data.lat, lon: data.lon };
+        document.getElementById('location-name-text').textContent = data.display_name;
+        updateSaveLink();
+        fetchUV(data.lat, data.lon);
+    })
+    .catch(err => {
+        showLoading(false);
+        document.getElementById('location-mode').style.display = 'block';
+        document.getElementById('geocode-error').textContent = 'Geocoding failed. Please try again.';
+    });
+}
+
+function initApp() {
+    let modeEl = document.getElementById('location-mode');
+    let btnAuto = document.getElementById('btn-auto');
+    let btnManual = document.getElementById('btn-manual');
+    let manualInput = document.getElementById('manual-input');
+    let btnLookup = document.getElementById('btn-lookup');
+    let addressInput = document.getElementById('address-input');
+
+    modeEl.style.display = 'block';
+    showLoading(false);
+    hideResults();
+    renderFavorites();
+
+    btnAuto.addEventListener('click', function () {
+        modeEl.style.display = 'none';
+        fetchLocationUV();
+    });
+
+    btnManual.addEventListener('click', function () {
+        manualInput.style.display = 'flex';
+        btnAuto.classList.remove('active');
+        btnManual.classList.add('active');
+        addressInput.focus();
+    });
+
+    btnLookup.addEventListener('click', function () {
+        geocodeAndFetch(addressInput.value.trim());
+    });
+
+    addressInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            geocodeAndFetch(addressInput.value.trim());
+        }
+    });
+
+    document.getElementById('save-favorite').addEventListener('click', function (e) {
+        e.preventDefault();
+        if (currentLocation && currentLocation.name) {
+            addFavorite(currentLocation.name, currentLocation.lat, currentLocation.lon);
+            updateSaveLink();
+        }
+    });
+}
+
+initApp();
