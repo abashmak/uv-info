@@ -360,3 +360,72 @@ header {
         font-size: 14px;
     }
 }
+
+.disclaimer-link-wrap {
+    margin-top: 18px;
+    text-align: center;
+}
+
+.disclaimer-link {
+    font-size: 12px;
+    color: #777;
+    text-decoration: underline;
+}
+
+.disclaimer-link:hover {
+    color: #333;
+}
+
+.modal[hidden] {
+    display: none;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    position: relative;
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 480px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    font-size: 1.2rem;
+}
+
+.modal-close {
+    margin-top: 8px;
+    background: #2196F3;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.modal-close:hover {
+    background: #1976D2;
+}

@@ -362,3 +362,29 @@ function initApp() {
 }
 
 initApp();
+
+(function setupDisclaimer() {
+    const link = document.getElementById("disclaimer-link");
+    const modal = document.getElementById("disclaimer-modal");
+
+    if (!link || !modal) return;
+
+    const open = (e) => {
+        e.preventDefault();
+        modal.hidden = false;
+    };
+
+    const close = () => {
+        modal.hidden = true;
+    };
+
+    link.addEventListener("click", open);
+
+    modal.querySelectorAll("[data-close]").forEach(el => {
+        el.addEventListener("click", close);
+    });
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !modal.hidden) close();
+    });
+})();
