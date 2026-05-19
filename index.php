@@ -57,6 +57,39 @@
 
         <ul></ul>
       </div>
+
+      <div class="disclaimer-link-wrap">
+        <a href="#" id="disclaimer-link" class="disclaimer-link">Disclaimer</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="disclaimer-modal" class="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="disclaimer-title">
+      <h2 id="disclaimer-title">Disclaimer</h2>
+      <p>
+        The information provided on this website, including UV index readings,
+        forecasts, and safe sun-exposure time estimates, is for general
+        informational purposes only. Values are derived from third-party
+        weather data and simplified models, and may be inaccurate or out of
+        date.
+      </p>
+      <p>
+        Nothing on this site constitutes medical advice. The author is not a
+        medical professional and makes no representations or warranties about
+        the accuracy, completeness, or suitability of the information for any
+        purpose. Individual skin sensitivity, medications, altitude, reflective
+        surfaces, and other factors can significantly affect safe exposure.
+      </p>
+      <p>
+        Always consult a qualified healthcare provider for advice regarding
+        sun exposure, skin health, or any medical condition. By using this
+        site you agree that the author bears no responsibility or liability
+        for any harm, loss, or damage resulting from reliance on the
+        information presented.
+      </p>
+      <button type="button" id="disclaimer-close" class="modal-close" data-close>Close</button>
     </div>
   </div>
 
